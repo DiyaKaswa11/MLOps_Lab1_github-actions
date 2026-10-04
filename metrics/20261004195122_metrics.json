@@ -1,0 +1,17 @@
+{
+    "version": "20261004195122",
+    "dataset": "Breast Cancer Wisconsin",
+    "test_samples": 114,
+    "random_forest": {
+        "accuracy": 0.9561,
+        "f1_score": 0.9655,
+        "roc_auc": 0.9937,
+        "brier_score": 0.0321
+    },
+    "calibrated_random_forest": {
+        "accuracy": 0.9561,
+        "f1_score": 0.9655,
+        "roc_auc": 0.9927,
+        "brier_score": 0.0337
+    }
+}
