@@ -1,0 +1,7 @@
+lab_02/
+__pycache__/
+.pytest_cache/
+mlruns/
+data/
+mlflow.db
+.DS_Store

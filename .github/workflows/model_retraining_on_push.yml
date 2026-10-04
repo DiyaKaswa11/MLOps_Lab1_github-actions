@@ -1,0 +1,77 @@
+name: Model Retraining and Calibration
+
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "models/**"
+      - "metrics/**"
+      - "README.md"
+  schedule:
+    - cron: "0 0 * * 0"  # Every Sunday at midnight (UTC)
+  workflow_dispatch:      # Manual run button
+
+permissions:
+  contents: write  # Needed to commit models and metrics back to the repo
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run unit tests
+        run: pytest -v
+
+  train-and-evaluate:
+    needs: test  # Only runs if all tests pass
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Generate timestamp version
+        run: echo "TIMESTAMP=$(date '+%Y%m%d%H%M%S')" >> $GITHUB_ENV
+
+      - name: Train models
+        run: python src/train_model.py --timestamp "$TIMESTAMP"
+
+      - name: Evaluate models
+        run: python src/evaluate_model.py --timestamp "$TIMESTAMP"
+
+      - name: Show metrics in run summary
+        run: |
+          echo "## Model metrics for version $TIMESTAMP" >> $GITHUB_STEP_SUMMARY
+          sed 's/^/    /' "metrics/${TIMESTAMP}_metrics.json" >> $GITHUB_STEP_SUMMARY
+
+      - name: Commit and push model and metrics
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add models/ metrics/
+          if ! git diff --cached --quiet; then
+            git commit -m "Add model and metrics for version $TIMESTAMP"
+            git push
+          else
+            echo "No changes to commit."
+          fi
