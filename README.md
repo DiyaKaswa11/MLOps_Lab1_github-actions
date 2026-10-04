@@ -1,5 +1,7 @@
 # MLOps Lab 1 – Model Training, Versioning and Calibration with GitHub Actions
 
+![Pipeline](https://github.com/DiyaKaswa11/MLOps_Lab1_github-actions/actions/workflows/model_retraining_on_push.yml/badge.svg)
+
 Based on Lab 2 of the Github_Labs folder in the MLOps course (IE7305). Every push to `main` runs unit tests, then trains a Random Forest classifier and a calibrated version of it, evaluates both on a held-out test set, and commits the timestamp-versioned models and metrics back to the repository.
 
 ## Project Structure
